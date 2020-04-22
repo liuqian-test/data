@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-//循环队列的入队 出队 遍历
+//循环队列的入队 出队 遍历 扩容
 
 typedef struct Queue {
 	int *data;
@@ -26,12 +26,26 @@ void init(Queue *q, int len) {
 	q->count = 0;
 }
 
+void expand(Queue * q) {
+	int *temp = q->data;   //先保存原始数据
+	q->tail = q->length - 1; //
+	q->length = 2 * q->length;
+	q->data = (int *)malloc(sizeof(int) * q->length);
+	int j = 0; //将原始数据从头到尾 放入新数组从0开始
+	for(int i = q->head; i <= q->tail; i++) {
+		q->data[j] = temp[i % (q->length)];
+		j++;
+	}
+	q->head = 0;
+	free(temp);
+	printf("扩容成功\n");
+}
+
 void push(Queue *q, int num) {
 	if(q == NULL) return ;
 	if(q->count >= q->length) {
-		return;
+		expand(q);  //扩容
 	}
-
 	q->tail++;
 	q->data[(q->tail) % (q->length)] = num;
 	q->count++;
@@ -58,7 +72,7 @@ void clean(Queue*q) {
 int main() {
 	Queue *q = (Queue *)malloc(sizeof(Queue));
 	init(q, 5);
-	for(int i = 0; i < 5; i++) {
+	for(int i = 0; i < 8; i++) {
 		push(q, i);
 	}
 
