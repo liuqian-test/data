@@ -35,10 +35,78 @@ Node *init(int num) {
 	return p;
 }
 
-Node *insert(Node *root, int key); {
-	if(root == NIL) return init(key);
-	if
+void UpdateHeight(Node *node) {
+	int h1 = node->lchild->h;
+	int h2 = node->rchild->h;
+	node->h = (h1 > h2 ? h1 : h2) + 1;
+	return ;
+}
 
+Node *left_rotate(Node *node) {
+	Node *temp = node->rchild;
+	node->rchild = temp->lchild;
+	temp->lchild = node;
+	UpdateHeight(node);
+	UpdateHeight(temp);
+	return temp;
+}
+
+Node *right_rotate(Node *node) {
+	Node *temp = node->lchild;
+	node->lchild = temp->rchild;
+	temp->rchild = node;
+	UpdateHeight(node);
+	UpdateHeight(temp);
+	return temp;
+}
+
+Node *maintain(Node *node) {
+	if(abs(node->lchild->h - node->rchild->h) <= 1) return node;
+	if(node->lchild->h > node->rchild->h) {
+		if(node->lchild->lchild->h < node->lchild->rchild->h){
+			node->lchild = left_rotate(node->lchild);
+		}
+		node = right_rotate(node);
+	} else {
+		if(node->rchild->lchild->h > node->rchild->rchild->h) {
+			node->rchild = right_rotate(node->rchild);
+		}
+		node = left_rotate(node);
+	}
+	return node;
+}
+
+Node *insert(Node *root, int key) {
+	if(root == NIL) return init(key);
+	if(key > root->num) root->rchild = insert(root->rchild, key);
+	else root->lchild = insert(root->lchild, key);
+	UpdateHeight(root);
+	return maintain(root);
+}
+
+Node *predecessor(Node *node) {
+	Node *temp = node->lchild;
+	while(temp->rchild) temp = temp->rchild;
+	return temp;
+}
+
+Node *erase(Node *node, int num) {
+	if(node == NIL) return node;
+	if(num > node->num) node->rchild = erase(node->rchild, num);
+	else if(num < node->num) node->lchild = erase(node->lchild, num);
+	else {
+		if(node->lchild == NIL || node->rchild == NIL) {
+			Node *temp = node->lchild ? node->lchild : node->rchild;
+			free(node);
+			return temp;
+		} else {
+			Node *temp = predecessor(node);
+			node->num = temp->num;
+			node->lchild = erase(node->lchild, temp->num);
+		}
+	}	
+		UpdateHeight(node);
+		return maintain(node);
 }
 
 
