@@ -35,7 +35,7 @@ Node *init(int num) {
 void UpdateHeight(Node *node) {
 	int h1 = node->rchild->h;
 	int h2 = node->lchild->h;
-	node->h = h1 > h2 ? h1 : h2;
+	node->h = (h1 > h2 ? h1 : h2) + 1;
 }
 
 Node *right_rotate(Node *node) {
@@ -60,7 +60,7 @@ Node *maintain(Node *node) {
 	if(abs(node->lchild->h - node->rchild->h) <= 1) return node;
 	if(node->lchild->h > node->rchild->h) {
 		if(node->lchild->rchild->h > node->lchild->lchild->h) {
-			node->lchild = left_rotate(node->rchild);
+			node->lchild = left_rotate(node->lchild);
 		}
 			node = right_rotate(node);
 	} else {
@@ -81,9 +81,28 @@ Node *insert(Node *node, int num) {
 	return maintain(node);
 }
 
-Node *erase(Node *node, int val) {
-	
+Node *predecessor(Node *node) {
+	Node *temp = node->lchild;
+	while(temp->rchild) temp = temp->rchild;
+	return temp;
+}
 
+Node *erase(Node *node, int val) {
+	if(node == NIL) return node;
+	if(val > node->num) node->rchild = erase(node->rchild, val);
+	else if(val < node->num) node->lchild = erase(node->lchild, val);
+	else {
+		if(node->lchild == NIL || node->rchild == NIL) {
+			Node *temp = node->lchild ? node->lchild : node->rchild;
+			free(node);
+			return temp;
+		} else {
+			Node *temp = predecessor(node);
+			node->num = temp->num;
+			node->lchild = erase(node->lchild, temp->num);
+		}
+	}
+	UpdateHeight(node);
 	return maintain(node);
 }
 
@@ -91,7 +110,7 @@ Node *erase(Node *node, int val) {
 void output(Node *node) {
 	if(node == NIL) return ;
 	output(node->lchild);
-	printf("%d ", node->num);
+	printf("%d [%d %d]\n", node->num, node->lchild->num, node->rchild->num);
 	output(node->rchild);
 }
 
