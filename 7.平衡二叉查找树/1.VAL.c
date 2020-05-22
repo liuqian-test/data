@@ -78,6 +78,7 @@ Node *maintain(Node *node) {
 
 Node *insert(Node *root, int key) {
 	if(root == NIL) return init(key);
+	if(root->num == key) return root;
 	if(key > root->num) root->rchild = insert(root->rchild, key);
 	else root->lchild = insert(root->lchild, key);
 	UpdateHeight(root);
@@ -109,7 +110,12 @@ Node *erase(Node *node, int num) {
 		return maintain(node);
 }
 
-
+void output(Node *node) {
+	if(node == NIL) return ;
+	output(node->lchild);
+	printf("%d [%d %d]\n", node->num, node->lchild->num, node->rchild->num);
+	output(node->rchild);
+}
 
 void clear(Node *node) {
 	if(node == NIL) return ;
@@ -119,8 +125,15 @@ void clear(Node *node) {
 	return ;
 }
 
-int mian() {
-	 
-
+int main() {
+	int val, op;
+	Node *root = NIL;
+	while(~scanf("%d%d", &op, &val)) {
+		switch(op) {
+			case 1 : root = insert(root, val); break;
+			case 2 : root = erase(root, val); break;
+		}
+		output(root);
+	}
 	return 0;
 }
