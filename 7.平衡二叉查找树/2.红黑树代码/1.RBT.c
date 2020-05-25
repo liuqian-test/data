@@ -30,7 +30,7 @@ void NIL_init() {
 }
 
 Node *init(int num) {
-	Node *node = malloc(sizeof(Node));
+	Node *node =(Node *)malloc(sizeof(Node));
 	node->num = num;
 	node->color = RED;
 	node->lchild = node->rchild = NIL;
@@ -43,6 +43,7 @@ int hasRedChild(Node *node) {
 
 Node *insert_maintain(Node *node) {
 	if(!hasRedChild(node)) return node;
+
 
 	return node;
 }
